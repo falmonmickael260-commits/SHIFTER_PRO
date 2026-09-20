@@ -1,8 +1,10 @@
 .tournaments {
+  position: relative;
+  overflow: hidden;
   background: var(--sp-bg-deep);
   padding: var(--sp-space-9) var(--sp-space-5);
 }
-.tournaments__inner { max-width: 1040px; margin: 0 auto; }
+.tournaments__inner { position: relative; z-index: 1; max-width: 1040px; margin: 0 auto; }
 
 .tournaments__layout {
   display: grid;
@@ -146,6 +148,7 @@
 .registration__checkbox input { width: 16px; height: 16px; accent-color: var(--sp-accent); }
 
 .registration__submit {
+  position: relative;
   width: 100%;
   padding: 12px;
   border: 1px solid var(--sp-accent);
@@ -162,6 +165,7 @@
 }
 .registration__submit:hover { transform: translateY(-2px); }
 .registration__submit:focus-visible { outline: 2px solid var(--sp-white); outline-offset: 2px; }
+.registration__submit:active { transform: translateY(0) scale(0.97); }
 
 .registration__status {
   margin: var(--sp-space-3) 0 0;

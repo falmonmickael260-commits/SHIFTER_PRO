@@ -16,6 +16,7 @@ export function Business({ contactEmail, discordTag = "BKHHWW.26" }: BusinessPro
 
   return (
     <section className="business" id="business">
+      <div className="section-glow" aria-hidden="true" />
       <div className="business__inner">
         <SectionHeading eyebrow="PARTNERSHIPS" title="Business & Collaborations" />
 

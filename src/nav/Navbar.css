@@ -58,10 +58,15 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background var(--sp-duration-fast), color var(--sp-duration-fast);
+  transition: background var(--sp-duration-fast), color var(--sp-duration-fast), box-shadow var(--sp-duration-fast), transform var(--sp-duration-fast);
 }
 .navbar__cta:hover,
-.navbar__cta:focus-visible { background: var(--sp-accent); color: var(--sp-bg-deep); }
+.navbar__cta:focus-visible {
+  background: var(--sp-accent);
+  color: var(--sp-bg-deep);
+  box-shadow: 0 0 16px rgba(var(--sp-accent-rgb), 0.4);
+}
+.navbar__cta:active { transform: scale(0.94); }
 
 .navbar__toggle {
   display: none;

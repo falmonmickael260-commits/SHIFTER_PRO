@@ -24,6 +24,7 @@
   outline: 2px solid var(--sp-accent);
   outline-offset: 2px;
 }
+.social-link:active { transform: translateY(0) scale(0.96); }
 .social-link__icon {
   font-size: 18px;
   line-height: 1;

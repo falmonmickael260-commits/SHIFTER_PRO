@@ -28,6 +28,7 @@ export function About({ roles = DEFAULT_ROLES, bio, stats = DEFAULT_STATS }: Abo
 
   return (
     <section className="about" id="about">
+      <div className="section-glow" aria-hidden="true" />
       <div className="about__inner">
         <SectionHeading eyebrow="IDENTITY" title="About SHIFTER_PRO" />
 

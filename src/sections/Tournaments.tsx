@@ -152,6 +152,7 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
 
   return (
     <section className="tournaments" id="tournaments">
+      <div className="section-glow" aria-hidden="true" />
       <div className="tournaments__inner">
         <SectionHeading eyebrow="COMPETITION // SHIFTER_PRO26" title="Tournaments" />
 
@@ -231,8 +232,9 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
                   <span>Je suis capitaine de l'équipe</span>
                 </label>
 
-                <button type="submit" className="registration__submit">
+                <button type="submit" className="registration__submit cta-pulse">
                   {hasEntryFee ? "Continuer vers le paiement" : "S'inscrire"}
+                  <span className="cta-shine" aria-hidden="true" />
                 </button>
               </>
             )}

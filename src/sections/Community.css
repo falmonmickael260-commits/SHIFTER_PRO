@@ -1,8 +1,12 @@
 .community {
+  position: relative;
+  overflow: hidden;
   background: var(--sp-bg-base);
   padding: var(--sp-space-9) var(--sp-space-5);
 }
 .community__inner {
+  position: relative;
+  z-index: 1;
   max-width: 680px;
   margin: 0 auto;
   display: flex;
@@ -26,6 +30,7 @@
 }
 
 .community__join {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -49,6 +54,7 @@
   box-shadow: 0 0 24px rgba(var(--sp-accent-rgb), 0.4);
 }
 .community__join:focus-visible { outline: 2px solid var(--sp-white); outline-offset: 3px; }
+.community__join:active { transform: translateY(0) scale(0.96); }
 
 .community__socials {
   display: flex;

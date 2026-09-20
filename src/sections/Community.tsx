@@ -38,6 +38,7 @@ export function Community({
 
   return (
     <section className="community" id="community">
+      <div className="section-glow" aria-hidden="true" />
       <div className="community__inner">
         <SectionHeading eyebrow="COMMUNITY" title="Join the Squad" align="center" />
 
@@ -47,12 +48,14 @@ export function Community({
           </p>
 
           {discordInviteUrl ? (
-            <a className="community__join" href={discordInviteUrl} target="_blank" rel="noreferrer">
+            <a className="community__join cta-pulse" href={discordInviteUrl} target="_blank" rel="noreferrer">
               <DiscordIcon /> Join Discord
+              <span className="cta-shine" aria-hidden="true" />
             </a>
           ) : (
-            <button type="button" className="community__join" onClick={handleJoinClick}>
+            <button type="button" className="community__join cta-pulse" onClick={handleJoinClick}>
               <DiscordIcon /> {copied ? "Tag copié !" : `Join Discord — ${discordTag}`}
+              <span className="cta-shine" aria-hidden="true" />
             </button>
           )}
 

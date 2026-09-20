@@ -1,8 +1,10 @@
 .business {
+  position: relative;
+  overflow: hidden;
   background: var(--sp-bg-base);
   padding: var(--sp-space-9) var(--sp-space-5);
 }
-.business__inner { max-width: 680px; margin: 0 auto; }
+.business__inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
 
 .business__areas {
   display: flex;

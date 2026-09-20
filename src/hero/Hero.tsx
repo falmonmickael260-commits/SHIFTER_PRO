@@ -74,8 +74,9 @@ export function Hero({
         <h1 className="hero__name">{displayName}</h1>
 
         <div className="hero__cta-row">
-          <a className="hero__cta hero__cta--primary" href={watchLiveHref}>
+          <a className="hero__cta hero__cta--primary cta-pulse" href={watchLiveHref}>
             Watch Live
+            <span className="cta-shine" aria-hidden="true" />
           </a>
           <a className="hero__cta hero__cta--secondary" href={tournamentsHref}>
             Tournaments

@@ -1,8 +1,10 @@
 .about {
+  position: relative;
+  overflow: hidden;
   background: var(--sp-bg-deep);
   padding: var(--sp-space-9) var(--sp-space-5);
 }
-.about__inner { max-width: 780px; margin: 0 auto; }
+.about__inner { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; }
 
 .about__roles {
   display: flex;

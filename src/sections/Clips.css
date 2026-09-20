@@ -1,8 +1,10 @@
 .clips {
+  position: relative;
+  overflow: hidden;
   background: var(--sp-bg-base);
   padding: var(--sp-space-9) var(--sp-space-5);
 }
-.clips__inner { max-width: 1120px; margin: 0 auto; }
+.clips__inner { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; }
 
 .clips__grid {
   display: grid;
@@ -64,7 +66,9 @@
   transform: translate(-50%, -50%) scale(1);
   border-color: var(--sp-accent);
   color: var(--sp-accent);
+  box-shadow: 0 0 20px rgba(var(--sp-accent-rgb), 0.35);
 }
+.clip-card__play:active { transform: translate(-50%, -50%) scale(0.88); }
 
 .clip-card__duration {
   position: absolute;

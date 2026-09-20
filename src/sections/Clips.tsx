@@ -56,6 +56,7 @@ function ClipCard({ clip, index }: { clip: Clip; index: number }) {
 export function Clips({ clips = EXAMPLE_CLIPS }: ClipsProps) {
   return (
     <section className="clips" id="clips">
+      <div className="section-glow" aria-hidden="true" />
       <div className="clips__inner">
         <SectionHeading eyebrow="HIGHLIGHTS" title="Best Moments" />
 

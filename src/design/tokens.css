@@ -93,6 +93,78 @@
   }
 }
 
+/* ---- ambient section glow ---------------------------------------------------
+   Cheap CSS-only light (no canvas) for sections that don't run their own
+   AtmosphereFX — a soft accent bloom drifting near the top. Give the
+   section itself `position: relative` so this sits correctly behind its
+   content (z-index: 0 vs. content's own stacking context). */
+.section-glow {
+  position: absolute;
+  top: -8%;
+  left: 50%;
+  width: min(60vw, 640px);
+  height: min(60vw, 640px);
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(var(--sp-accent-rgb), 0.1) 0%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .section-glow { animation: glowDrift 10s ease-in-out infinite; }
+}
+@keyframes glowDrift {
+  0%, 100% { opacity: 0.7; transform: translateX(-50%) translateY(0); }
+  50% { opacity: 1; transform: translateX(-50%) translateY(14px); }
+}
+
+/* ---- CTA shine sweep ---------------------------------------------------------
+   A light bar sweeping across a solid-fill CTA on hover. Markup: put
+   `<span className="cta-shine" aria-hidden />` as the button's last child
+   and list that button's own class in the hover selector below (kept as
+   an explicit list rather than a generic ":hover > .cta-shine" — a few
+   named buttons only, not every element that happens to contain one). */
+.cta-shine {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.cta-shine::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  width: 34%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: translateX(-260%) skewX(-15deg);
+  transition: transform 650ms ease;
+}
+.hero__cta--primary:hover .cta-shine::after,
+.hero__cta--primary:focus-visible .cta-shine::after,
+.community__join:hover .cta-shine::after,
+.community__join:focus-visible .cta-shine::after,
+.registration__submit:hover .cta-shine::after,
+.registration__submit:focus-visible .cta-shine::after {
+  transform: translateX(360%) skewX(-15deg);
+}
+
+/* ---- idle glow pulse for primary CTAs ---------------------------------------- */
+.cta-pulse {
+  animation: ctaPulse 3.4s ease-in-out infinite;
+}
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(var(--sp-accent-rgb), 0); }
+  50% { box-shadow: 0 0 24px rgba(var(--sp-accent-rgb), 0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-glow { animation: none; }
+  .cta-shine::after { transition: none; }
+  .cta-pulse { animation: none; }
+}
+
 /* ---- scrollbar ---------------------------------------------------------- */
 * {
   scrollbar-color: var(--sp-steel) var(--sp-bg-deep);
