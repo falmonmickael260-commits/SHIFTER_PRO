@@ -4,6 +4,7 @@ import { CalendarIcon, CrownIcon, ShieldAlertIcon, TrophyIcon, UsersIcon } from 
 import { useInView } from "../hooks/useInView";
 import { PayPalButton } from "../components/PayPalButton";
 import type { RegistrationPaymentInput } from "../lib/paypal";
+import { TournamentPoster } from "./TournamentPoster";
 import "./Tournaments.css";
 
 export interface NextTournament {
@@ -109,12 +110,33 @@ function Podium({ tournament }: { tournament: PastTournament }) {
   );
 }
 
+const REGISTRATION_EMAIL = "Vantm26100@hotmail.com";
+
+function buildRegistrationMailto(fields: {
+  pseudo: string;
+  activisionId: string;
+  discord: string;
+  team: string;
+  isCaptain: boolean;
+}) {
+  const subject = `Inscription tournoi — ${fields.pseudo}`;
+  const body = [
+    `Pseudo : ${fields.pseudo}`,
+    `Activision ID : ${fields.activisionId}`,
+    `Discord : ${fields.discord}`,
+    `Équipe : ${fields.team || "—"}`,
+    `Capitaine : ${fields.isCaptain ? "Oui" : "Non"}`,
+  ].join("\n");
+  return `mailto:${REGISTRATION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 /**
- * Registration UI only — no backend is connected yet. Submitting shows an
- * honest status message rather than pretending the entry was saved; the
- * field set (pseudo / Activision ID / Discord / team / captain) is exactly
- * what a future Supabase table would need, so wiring it up later is a
- * matter of an API call here, not a redesign.
+ * Registration UI — no database is connected yet, so submitting opens a
+ * pre-filled email to the streamer's own inbox (a real, working interim
+ * path, not a fake "saved" state) instead of pretending the entry was
+ * stored. The field set (pseudo / Activision ID / Discord / team /
+ * captain) is exactly what a future Supabase table would need, so wiring
+ * that up later is a matter of an API call here, not a redesign.
  */
 export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, rules = DEFAULT_RULES }: TournamentsProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
@@ -127,6 +149,14 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
     event.preventDefault();
 
     if (!hasEntryFee) {
+      const form = new FormData(event.currentTarget);
+      window.location.href = buildRegistrationMailto({
+        pseudo: String(form.get("pseudo") ?? ""),
+        activisionId: String(form.get("activisionId") ?? ""),
+        discord: String(form.get("discord") ?? ""),
+        team: String(form.get("team") ?? ""),
+        isCaptain,
+      });
       setSubmitState("sent");
       return;
     }
@@ -196,6 +226,7 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
           </div>
 
           <form
+            id="tournament-registration"
             ref={formRef}
             className={`registration reveal${formVisible ? " reveal--visible" : ""}`}
             onSubmit={handleSubmit}
@@ -250,7 +281,7 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
 
             <p className="registration__status" role="status" aria-live="polite">
               {submitState === "sent" &&
-                "Formulaire reçu — les inscriptions ouvriront officiellement dès que la base de données sera connectée. Rejoins le Discord pour être prévenu."}
+                "Ton client email va s'ouvrir avec ta demande d'inscription pré-remplie — il ne reste plus qu'à l'envoyer pour la valider."}
               {submitState === "paid" && "Paiement confirmé — ton inscription est enregistrée. À bientôt en jeu !"}
             </p>
           </form>
@@ -282,6 +313,8 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
             </div>
           )}
         </div>
+
+        <TournamentPoster />
       </div>
     </section>
   );

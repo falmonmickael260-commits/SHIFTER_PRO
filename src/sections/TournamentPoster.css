@@ -1,0 +1,235 @@
+/* ==========================================================================
+   Official CASHPRIZE 2 poster block — scoped neon-green identity, matching
+   the poster's own art direction. --poster-accent overrides nothing
+   outside this block; the rest of the site keeps its established palette.
+   ========================================================================== */
+
+.tournament-poster {
+  --poster-accent: #7cff2e;
+  --poster-accent-rgb: 124, 255, 46;
+
+  position: relative;
+  margin-top: var(--sp-space-7);
+  padding: var(--sp-space-6);
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.35);
+  border-radius: var(--sp-radius-md);
+  background:
+    radial-gradient(120% 140% at 10% 0%, rgba(var(--poster-accent-rgb), 0.08), transparent 55%),
+    repeating-radial-gradient(circle at 0 0, rgba(var(--poster-accent-rgb), 0.05) 0, transparent 2px, transparent 28px),
+    #060a06;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) 1fr;
+  gap: var(--sp-space-6);
+  align-items: center;
+}
+
+.tournament-poster__image-wrap {
+  position: relative;
+  border-radius: var(--sp-radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.4);
+  box-shadow: 0 0 42px -8px rgba(var(--poster-accent-rgb), 0.45);
+}
+.tournament-poster__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1024 / 1536;
+}
+
+.tournament-poster__info {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-3);
+}
+
+.tournament-poster__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  font-family: var(--sp-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--poster-accent);
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.4);
+  border-radius: var(--sp-radius-sm);
+  padding: 4px 10px;
+}
+
+.tournament-poster__title {
+  margin: 0;
+  font-family: var(--sp-font-display);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  text-transform: uppercase;
+  color: var(--sp-white);
+  text-shadow: 0 0 24px rgba(var(--poster-accent-rgb), 0.4);
+}
+
+/* The date is the single most important fact on this block. */
+.tournament-poster__date {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: var(--sp-space-1) 0;
+  padding: var(--sp-space-3) var(--sp-space-4);
+  border: 1px solid var(--poster-accent);
+  border-radius: var(--sp-radius-sm);
+  background: rgba(var(--poster-accent-rgb), 0.08);
+  box-shadow: 0 0 30px -6px rgba(var(--poster-accent-rgb), 0.5);
+}
+.tournament-poster__date-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sp-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(var(--poster-accent-rgb), 0.85);
+}
+.tournament-poster__date-value {
+  font-family: var(--sp-font-display);
+  font-weight: 700;
+  font-size: clamp(1.3rem, 3.2vw, 1.9rem);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--poster-accent);
+}
+.tournament-poster__date-time {
+  font-family: var(--sp-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--sp-steel-light);
+}
+
+.tournament-poster__facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-space-3);
+}
+.tournament-poster__fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+}
+.tournament-poster__fact svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--poster-accent);
+  font-size: 16px;
+}
+.tournament-poster__fact > div { display: flex; flex-direction: column; gap: 2px; }
+.tournament-poster__fact-label {
+  font-family: var(--sp-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sp-steel-light);
+}
+.tournament-poster__fact-value {
+  font-family: var(--sp-font-body);
+  font-weight: 600;
+  color: var(--sp-white);
+}
+
+.tournament-poster__podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-space-2);
+}
+.tournament-poster__prize {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--sp-space-3) var(--sp-space-2);
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.3);
+  border-radius: var(--sp-radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--sp-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sp-steel-light);
+}
+.tournament-poster__prize svg { font-size: 18px; }
+.tournament-poster__prize strong {
+  font-family: var(--sp-font-display);
+  font-size: 1.2rem;
+  color: var(--sp-white);
+}
+.tournament-poster__prize--1 {
+  border-color: var(--poster-accent);
+  box-shadow: 0 0 20px -6px rgba(var(--poster-accent-rgb), 0.6);
+}
+.tournament-poster__prize--1 svg,
+.tournament-poster__prize--1 strong { color: var(--poster-accent); }
+
+.tournament-poster__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-space-3);
+  margin-top: var(--sp-space-2);
+}
+.tournament-poster__cta {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: var(--sp-radius-sm);
+  font-family: var(--sp-font-body);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform var(--sp-duration-fast) var(--sp-ease-out), box-shadow var(--sp-duration-fast), border-color var(--sp-duration-fast), color var(--sp-duration-fast);
+}
+.tournament-poster__cta--primary {
+  color: #060a06;
+  background: var(--poster-accent);
+  border: 1px solid var(--poster-accent);
+}
+.tournament-poster__cta--primary:hover,
+.tournament-poster__cta--primary:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 0 26px rgba(var(--poster-accent-rgb), 0.55);
+}
+.tournament-poster__cta--primary:active { transform: translateY(0) scale(0.96); }
+
+.tournament-poster__cta--secondary {
+  color: var(--sp-white);
+  background: transparent;
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.5);
+}
+.tournament-poster__cta--secondary:hover,
+.tournament-poster__cta--secondary:focus-visible {
+  border-color: var(--poster-accent);
+  color: var(--poster-accent);
+  transform: translateY(-2px);
+}
+.tournament-poster__cta--secondary:active { transform: translateY(0) scale(0.96); }
+
+.tournament-poster__cta:focus-visible {
+  outline: 2px solid var(--poster-accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .tournament-poster {
+    grid-template-columns: 1fr;
+    padding: var(--sp-space-4);
+    gap: var(--sp-space-4);
+  }
+  .tournament-poster__image-wrap { max-width: 360px; margin: 0 auto; width: 100%; }
+  .tournament-poster__cta { flex: 1 1 auto; justify-content: center; }
+}
