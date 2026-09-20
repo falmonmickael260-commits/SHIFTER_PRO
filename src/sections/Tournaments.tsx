@@ -2,9 +2,12 @@ import { type FormEvent, useState } from "react";
 import { SectionHeading } from "../components/SectionHeading";
 import { CalendarIcon, CrownIcon, ShieldAlertIcon, TrophyIcon, UsersIcon } from "../components/icons";
 import { useInView } from "../hooks/useInView";
+import { PayPalButton } from "../components/PayPalButton";
+import type { RegistrationPaymentInput } from "../lib/paypal";
 import "./Tournaments.css";
 
 export interface NextTournament {
+  id: string;
   game: string;
   date?: string;
   time?: string;
@@ -12,6 +15,10 @@ export interface NextTournament {
   capacity: string;
   prize?: string;
   registrationOpen: boolean;
+  /** Omit (or 0) for free entry — every tournament so far. Set this only
+   * once a real paid-entry format exists; it turns on the PayPal step. */
+  entryFeeCents?: number;
+  currency?: string;
 }
 
 export interface PodiumEntry {
@@ -41,6 +48,7 @@ export interface TournamentsProps {
 }
 
 const DEFAULT_NEXT: NextTournament = {
+  id: "next",
   game: "Call of Duty Warzone — Rebirth Island",
   date: "Environ 10 jours après le 19/09/2026 — date exacte à confirmer",
   format: "Trio — Ranked",
@@ -76,7 +84,7 @@ const DEFAULT_RULES: Rule[] = [
 
 const PLACE_LABEL: Record<1 | 2 | 3, string> = { 1: "1ère place", 2: "2ème place", 3: "3ème place" };
 
-type SubmitState = "idle" | "sent";
+type SubmitState = "idle" | "awaiting-payment" | "paid" | "sent";
 
 function Podium({ tournament }: { tournament: PastTournament }) {
   const ordered = [...tournament.podium].sort((a, b) => a.place - b.place);
@@ -111,10 +119,30 @@ function Podium({ tournament }: { tournament: PastTournament }) {
 export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, rules = DEFAULT_RULES }: TournamentsProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [isCaptain, setIsCaptain] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState<RegistrationPaymentInput | null>(null);
+
+  const hasEntryFee = Boolean(next.entryFeeCents && next.entryFeeCents > 0);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitState("sent");
+
+    if (!hasEntryFee) {
+      setSubmitState("sent");
+      return;
+    }
+
+    const form = new FormData(event.currentTarget);
+    setPendingPayment({
+      tournamentId: next.id,
+      pseudo: String(form.get("pseudo") ?? ""),
+      activisionId: String(form.get("activisionId") ?? ""),
+      discord: String(form.get("discord") ?? ""),
+      team: String(form.get("team") ?? "") || undefined,
+      isCaptain,
+      entryFeeCents: next.entryFeeCents!,
+      currency: next.currency ?? "EUR",
+    });
+    setSubmitState("awaiting-payment");
   }
 
   const { ref: nextRef, visible: nextVisible } = useInView<HTMLDivElement>();
@@ -171,36 +199,57 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
             className={`registration reveal${formVisible ? " reveal--visible" : ""}`}
             onSubmit={handleSubmit}
           >
-            <h3 className="registration__title">Inscription</h3>
+            <h3 className="registration__title">
+              Inscription
+              {hasEntryFee && (
+                <span className="registration__fee">
+                  {(next.entryFeeCents! / 100).toFixed(2)} {next.currency ?? "EUR"} / joueur
+                </span>
+              )}
+            </h3>
 
-            <label className="registration__field">
-              <span>Pseudo</span>
-              <input type="text" name="pseudo" required autoComplete="nickname" />
-            </label>
-            <label className="registration__field">
-              <span>Activision ID</span>
-              <input type="text" name="activisionId" required placeholder="Pseudo#1234" />
-            </label>
-            <label className="registration__field">
-              <span>Discord</span>
-              <input type="text" name="discord" required placeholder="pseudo.discord" />
-            </label>
-            <label className="registration__field">
-              <span>Équipe (optionnel)</span>
-              <input type="text" name="team" />
-            </label>
-            <label className="registration__checkbox">
-              <input type="checkbox" checked={isCaptain} onChange={(e) => setIsCaptain(e.target.checked)} />
-              <span>Je suis capitaine de l'équipe</span>
-            </label>
+            {submitState !== "awaiting-payment" && submitState !== "paid" && (
+              <>
+                <label className="registration__field">
+                  <span>Pseudo</span>
+                  <input type="text" name="pseudo" required autoComplete="nickname" />
+                </label>
+                <label className="registration__field">
+                  <span>Activision ID</span>
+                  <input type="text" name="activisionId" required placeholder="Pseudo#1234" />
+                </label>
+                <label className="registration__field">
+                  <span>Discord</span>
+                  <input type="text" name="discord" required placeholder="pseudo.discord" />
+                </label>
+                <label className="registration__field">
+                  <span>Équipe (optionnel)</span>
+                  <input type="text" name="team" />
+                </label>
+                <label className="registration__checkbox">
+                  <input type="checkbox" checked={isCaptain} onChange={(e) => setIsCaptain(e.target.checked)} />
+                  <span>Je suis capitaine de l'équipe</span>
+                </label>
 
-            <button type="submit" className="registration__submit">
-              S'inscrire
-            </button>
+                <button type="submit" className="registration__submit">
+                  {hasEntryFee ? "Continuer vers le paiement" : "S'inscrire"}
+                </button>
+              </>
+            )}
+
+            {submitState === "awaiting-payment" && pendingPayment && (
+              <div className="registration__payment">
+                <p className="registration__payment-hint">
+                  Paiement sécurisé par PayPal — l'inscription n'est confirmée qu'une fois le paiement validé.
+                </p>
+                <PayPalButton payment={pendingPayment} onPaid={() => setSubmitState("paid")} />
+              </div>
+            )}
 
             <p className="registration__status" role="status" aria-live="polite">
               {submitState === "sent" &&
                 "Formulaire reçu — les inscriptions ouvriront officiellement dès que la base de données sera connectée. Rejoins le Discord pour être prévenu."}
+              {submitState === "paid" && "Paiement confirmé — ton inscription est enregistrée. À bientôt en jeu !"}
             </p>
           </form>
         </div>
