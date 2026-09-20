@@ -8,6 +8,7 @@ import { Tournaments } from "./sections/Tournaments";
 import { Community } from "./sections/Community";
 import { About } from "./sections/About";
 import { Business } from "./sections/Business";
+import { Contact } from "./sections/Contact";
 import "./App.css";
 
 // The one real Discord invite for the whole site — every Discord button
@@ -32,6 +33,7 @@ function App() {
         <Community tiktokHandle="shifter_pro26" discordInviteUrl={DISCORD_INVITE_URL} />
         <About />
         <Business discordInviteUrl={DISCORD_INVITE_URL} />
+        <Contact discordInviteUrl={DISCORD_INVITE_URL} />
       </main>
 
       {!loaderDone && <ShifterLoader key={runId} onComplete={() => setLoaderDone(true)} />}

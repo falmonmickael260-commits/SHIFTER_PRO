@@ -8,7 +8,6 @@ interface ImportMetaEnv {
   readonly VITE_TWITCH_CLIENT_ID?: string;
   readonly VITE_DISCORD_INVITE_URL?: string;
   readonly VITE_BUSINESS_CONTACT_EMAIL?: string;
-  readonly VITE_WEB3FORMS_ACCESS_KEY?: string;
 }
 
 interface ImportMeta {

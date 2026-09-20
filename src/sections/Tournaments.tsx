@@ -2,7 +2,6 @@ import { type FormEvent, useState } from "react";
 import { SectionHeading } from "../components/SectionHeading";
 import { CalendarIcon, CrownIcon, TrophyIcon, UsersIcon } from "../components/icons";
 import { useInView } from "../hooks/useInView";
-import { sendRegistration } from "../lib/registration";
 import { TournamentPoster } from "./TournamentPoster";
 import { TournamentRules, type Rule } from "./TournamentRules";
 import "./Tournaments.css";
@@ -133,7 +132,7 @@ const DEFAULT_RULES: Rule[] = [
 
 const PLACE_LABEL: Record<1 | 2 | 3, string> = { 1: "1ère place", 2: "2ème place", 3: "3ème place" };
 
-type SubmitState = "idle" | "sent-auto" | "sent-draft";
+type SubmitState = "idle" | "sent";
 
 function Podium({ tournament }: { tournament: PastTournament }) {
   const ordered = [...tournament.podium].sort((a, b) => a.place - b.place);
@@ -159,15 +158,13 @@ function Podium({ tournament }: { tournament: PastTournament }) {
 }
 
 /**
- * Registration UI — no database is connected yet, so submitting sends the
- * entry to the streamer's own inbox (automatically via Web3Forms once
- * configured, or a pre-filled email draft otherwise — see
- * src/lib/registration.ts) instead of pretending it was stored. Paid
- * entries also open a direct PayPal.me payment link — simple on purpose;
- * there's no automatic link back from a payment to a specific
- * registration, that trade-off was a deliberate choice over building out
- * the full Supabase + PayPal Orders API flow (still in supabase/functions
- * for later, just not wired up here).
+ * Registration UI — no database is connected yet and, by explicit choice,
+ * submitting does not trigger anything email-related (an earlier version
+ * did; that surprised players by popping open a mail client on top of
+ * PayPal). Paid entries now just open the direct PayPal.me payment link —
+ * the payment note the player writes there is the registration record.
+ * Questions go through the dedicated Contact section instead, never an
+ * automatic action tied to this button.
  */
 export function Tournaments({
   next = DEFAULT_NEXT,
@@ -182,26 +179,10 @@ export function Tournaments({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-
-    // Open PayPal synchronously, first thing, still inside the click
-    // handler — browsers drop "this tab was opened by a real click"
-    // status once anything is awaited first, and silently block the
-    // popup. sendRegistration (below) does await a fetch call when
-    // Web3Forms is configured, so it must run after, not before.
     if (hasEntryFee) {
       window.open(paypalMeLink(next.entryFeeCents! / 100), "_blank", "noopener,noreferrer");
     }
-
-    sendRegistration({
-      pseudo: String(form.get("pseudo") ?? ""),
-      activisionId: String(form.get("activisionId") ?? ""),
-      discord: String(form.get("discord") ?? ""),
-      team: String(form.get("team") ?? ""),
-      isCaptain,
-    }).then((result) => {
-      setSubmitState(result === "sent-automatically" ? "sent-auto" : "sent-draft");
-    });
+    setSubmitState("sent");
   }
 
   const { ref: nextRef, visible: nextVisible } = useInView<HTMLDivElement>();
@@ -291,7 +272,8 @@ export function Tournaments({
 
             {hasEntryFee && (
               <p className="registration__payment-hint">
-                Après l'envoi, un onglet PayPal s'ouvre pour régler les {(next.entryFeeCents! / 100).toFixed(0)}€.
+                Un onglet PayPal va s'ouvrir pour régler les {(next.entryFeeCents! / 100).toFixed(0)}€ — indique
+                bien ton pseudo dans le message du paiement, c'est ce qui confirme ton inscription.
               </p>
             )}
 
@@ -301,14 +283,10 @@ export function Tournaments({
             </button>
 
             <p className="registration__status" role="status" aria-live="polite">
-              {submitState === "sent-auto" &&
+              {submitState === "sent" &&
                 (hasEntryFee
-                  ? "Inscription envoyée ! Finalise ton paiement sur l'onglet PayPal qui vient de s'ouvrir."
-                  : "Inscription envoyée — à bientôt en jeu !")}
-              {submitState === "sent-draft" &&
-                (hasEntryFee
-                  ? "Ton client email va s'ouvrir avec ta demande — envoie-le, puis règle le paiement sur l'onglet PayPal qui vient de s'ouvrir."
-                  : "Ton client email va s'ouvrir avec ta demande d'inscription pré-remplie — il ne reste plus qu'à l'envoyer pour la valider.")}
+                  ? "Un onglet PayPal vient de s'ouvrir — n'oublie pas d'indiquer ton pseudo dans le paiement !"
+                  : `Merci ! Rejoins le Discord (#3 des règles) pour la suite.`)}
             </p>
           </form>
         </div>
