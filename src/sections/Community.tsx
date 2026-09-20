@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SectionHeading } from "../components/SectionHeading";
 import { SocialLink } from "../components/SocialLink";
 import { DiscordIcon, KickIcon, TikTokIcon, TwitchIcon } from "../components/icons";
+import { useInView } from "../hooks/useInView";
 import "./Community.css";
 
 export interface CommunityProps {
@@ -22,6 +23,7 @@ export function Community({
   tiktokHandle,
 }: CommunityProps) {
   const [copied, setCopied] = useState(false);
+  const { ref: bodyRef, visible: bodyVisible } = useInView<HTMLDivElement>();
 
   async function handleJoinClick() {
     if (discordInviteUrl) return;
@@ -38,25 +40,28 @@ export function Community({
     <section className="community" id="community">
       <div className="community__inner">
         <SectionHeading eyebrow="COMMUNITY" title="Join the Squad" align="center" />
-        <p className="community__intro">
-          Le QG de la communauté SHIFTER_PRO : tactique, entraide et tournois entre membres.
-        </p>
 
-        {discordInviteUrl ? (
-          <a className="community__join" href={discordInviteUrl} target="_blank" rel="noreferrer">
-            <DiscordIcon /> Join Discord
-          </a>
-        ) : (
-          <button type="button" className="community__join" onClick={handleJoinClick}>
-            <DiscordIcon /> {copied ? "Tag copié !" : `Join Discord — ${discordTag}`}
-          </button>
-        )}
+        <div ref={bodyRef} className={`community__body reveal${bodyVisible ? " reveal--visible" : ""}`}>
+          <p className="community__intro">
+            Le QG de la communauté SHIFTER_PRO : tactique, entraide et tournois entre membres.
+          </p>
 
-        <div className="community__socials">
-          <SocialLink icon={<TwitchIcon />} label="Twitch" href={`https://twitch.tv/${twitchHandle}`} />
-          <SocialLink icon={<KickIcon />} label="Kick" href={kickHandle ? `https://kick.com/${kickHandle}` : undefined} />
-          <SocialLink icon={<TikTokIcon />} label="TikTok" href={tiktokHandle ? `https://tiktok.com/@${tiktokHandle}` : undefined} />
-          <SocialLink icon={<DiscordIcon />} label="Discord" href={discordInviteUrl} />
+          {discordInviteUrl ? (
+            <a className="community__join" href={discordInviteUrl} target="_blank" rel="noreferrer">
+              <DiscordIcon /> Join Discord
+            </a>
+          ) : (
+            <button type="button" className="community__join" onClick={handleJoinClick}>
+              <DiscordIcon /> {copied ? "Tag copié !" : `Join Discord — ${discordTag}`}
+            </button>
+          )}
+
+          <div className="community__socials">
+            <SocialLink icon={<TwitchIcon />} label="Twitch" href={`https://twitch.tv/${twitchHandle}`} />
+            <SocialLink icon={<KickIcon />} label="Kick" href={kickHandle ? `https://kick.com/${kickHandle}` : undefined} />
+            <SocialLink icon={<TikTokIcon />} label="TikTok" href={tiktokHandle ? `https://tiktok.com/@${tiktokHandle}` : undefined} />
+            <SocialLink icon={<DiscordIcon />} label="Discord" href={discordInviteUrl} />
+          </div>
         </div>
       </div>
     </section>

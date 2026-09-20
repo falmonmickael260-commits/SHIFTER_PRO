@@ -67,3 +67,39 @@
   --sp-z-overlay: 200;
   --sp-z-loader: 9999;
 }
+
+/* ---- scroll reveal ---------------------------------------------------------
+   Shared by every section past the Hero (see src/hooks/useInView.ts). One
+   consistent motion signature for the whole site, not a per-section
+   reinvention — the loader's own reveals use this same ease/duration. */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 700ms var(--sp-ease-out), transform 700ms var(--sp-ease-out);
+}
+.reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---- scrollbar ---------------------------------------------------------- */
+* {
+  scrollbar-color: var(--sp-steel) var(--sp-bg-deep);
+  scrollbar-width: thin;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: var(--sp-bg-deep); }
+*::-webkit-scrollbar-thumb {
+  background: var(--sp-steel);
+  border-radius: var(--sp-radius-sm);
+  border: 2px solid var(--sp-bg-deep);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--sp-steel-light); }

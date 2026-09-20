@@ -1,5 +1,7 @@
+import type { CSSProperties } from "react";
 import { SectionHeading } from "../components/SectionHeading";
 import { PlayIcon } from "../components/icons";
+import { useInView } from "../hooks/useInView";
 import "./Clips.css";
 
 export interface Clip {
@@ -28,6 +30,29 @@ const EXAMPLE_CLIPS: Clip[] = [
   { id: "ex-4", title: "Finale de tournoi", duration: "1:04", views: "—", format: "horizontal", game: "Call of Duty" },
 ];
 
+function ClipCard({ clip, index }: { clip: Clip; index: number }) {
+  const { ref, visible } = useInView<HTMLElement>();
+  return (
+    <article
+      ref={ref}
+      className={`clip-card clip-card--${clip.format} reveal${visible ? " reveal--visible" : ""}`}
+      style={{ transitionDelay: `${(index % 4) * 90}ms` } as CSSProperties}
+    >
+      <div className="clip-card__thumb">
+        <span className="clip-card__scan" aria-hidden="true" />
+        <button type="button" className="clip-card__play" aria-label={`Lire ${clip.title}`}>
+          <PlayIcon />
+        </button>
+        <span className="clip-card__duration">{clip.duration}</span>
+      </div>
+      <div className="clip-card__meta">
+        <h3 className="clip-card__title">{clip.title}</h3>
+        <span className="clip-card__game">{clip.game}</span>
+      </div>
+    </article>
+  );
+}
+
 export function Clips({ clips = EXAMPLE_CLIPS }: ClipsProps) {
   return (
     <section className="clips" id="clips">
@@ -35,20 +60,8 @@ export function Clips({ clips = EXAMPLE_CLIPS }: ClipsProps) {
         <SectionHeading eyebrow="HIGHLIGHTS" title="Best Moments" />
 
         <div className="clips__grid">
-          {clips.map((clip) => (
-            <article key={clip.id} className={`clip-card clip-card--${clip.format}`}>
-              <div className="clip-card__thumb">
-                <span className="clip-card__scan" aria-hidden="true" />
-                <button type="button" className="clip-card__play" aria-label={`Lire ${clip.title}`}>
-                  <PlayIcon />
-                </button>
-                <span className="clip-card__duration">{clip.duration}</span>
-              </div>
-              <div className="clip-card__meta">
-                <h3 className="clip-card__title">{clip.title}</h3>
-                <span className="clip-card__game">{clip.game}</span>
-              </div>
-            </article>
+          {clips.map((clip, index) => (
+            <ClipCard key={clip.id} clip={clip} index={index} />
           ))}
         </div>
 

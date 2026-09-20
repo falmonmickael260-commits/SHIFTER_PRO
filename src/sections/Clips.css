@@ -17,9 +17,13 @@
   border-radius: var(--sp-radius-md);
   background: var(--sp-surface);
   overflow: hidden;
-  transition: border-color var(--sp-duration-fast), transform var(--sp-duration-fast);
+  transition: border-color var(--sp-duration-fast), transform var(--sp-duration-fast), box-shadow var(--sp-duration-fast);
 }
-.clip-card:hover { border-color: var(--sp-border-strong); transform: translateY(-3px); }
+.clip-card:hover {
+  border-color: var(--sp-accent);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px -12px rgba(var(--sp-accent-rgb), 0.35);
+}
 
 .clip-card__thumb {
   position: relative;

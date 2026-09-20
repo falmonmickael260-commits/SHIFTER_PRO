@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AtmosphereFX } from "../components/AtmosphereFX";
 import { SectionHeading } from "../components/SectionHeading";
 import { ExternalLinkIcon, KickIcon, TwitchIcon } from "../components/icons";
+import { useInView } from "../hooks/useInView";
 import "./Live.css";
 
 export interface LiveProps {
@@ -73,6 +74,8 @@ export function Live({ twitchHandle = "shifter_pro2", kickHandle, live = false }
     };
   }, [platform, twitchHandle]);
 
+  const { ref: panelRef, visible: panelVisible } = useInView<HTMLDivElement>();
+
   return (
     <section className="live" id="live">
       <AtmosphereFX className="live__canvas" particleDensity={24} />
@@ -81,7 +84,7 @@ export function Live({ twitchHandle = "shifter_pro2", kickHandle, live = false }
       <div className="live__inner">
         <SectionHeading eyebrow="BROADCAST" title="Live" />
 
-        <div className="live__panel">
+        <div ref={panelRef} className={`live__panel reveal${panelVisible ? " reveal--visible" : ""}`}>
           <div className="live__tabs" role="tablist" aria-label="Plateforme de diffusion">
             <button
               type="button"

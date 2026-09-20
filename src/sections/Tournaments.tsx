@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { SectionHeading } from "../components/SectionHeading";
 import { CalendarIcon, TrophyIcon, UsersIcon } from "../components/icons";
+import { useInView } from "../hooks/useInView";
 import "./Tournaments.css";
 
 export interface NextTournament {
@@ -51,13 +52,17 @@ export function Tournaments({ next = DEFAULT_NEXT, history = [] }: TournamentsPr
     setSubmitState("sent");
   }
 
+  const { ref: nextRef, visible: nextVisible } = useInView<HTMLDivElement>();
+  const { ref: formRef, visible: formVisible } = useInView<HTMLFormElement>();
+  const { ref: historyRef, visible: historyVisible } = useInView<HTMLDivElement>();
+
   return (
     <section className="tournaments" id="tournaments">
       <div className="tournaments__inner">
         <SectionHeading eyebrow="COMPETITION" title="Tournaments" />
 
         <div className="tournaments__layout">
-          <div className="next-tournament">
+          <div ref={nextRef} className={`next-tournament reveal${nextVisible ? " reveal--visible" : ""}`}>
             <div className="next-tournament__badge">
               <TrophyIcon /> Prochain tournoi
             </div>
@@ -95,7 +100,11 @@ export function Tournaments({ next = DEFAULT_NEXT, history = [] }: TournamentsPr
             </dl>
           </div>
 
-          <form className="registration" onSubmit={handleSubmit}>
+          <form
+            ref={formRef}
+            className={`registration reveal${formVisible ? " reveal--visible" : ""}`}
+            onSubmit={handleSubmit}
+          >
             <h3 className="registration__title">Inscription</h3>
 
             <label className="registration__field">
@@ -130,7 +139,7 @@ export function Tournaments({ next = DEFAULT_NEXT, history = [] }: TournamentsPr
           </form>
         </div>
 
-        <div className="tournament-history">
+        <div ref={historyRef} className={`tournament-history reveal${historyVisible ? " reveal--visible" : ""}`}>
           <h3 className="tournament-history__title">Historique</h3>
           {history.length === 0 ? (
             <p className="tournament-history__empty">
