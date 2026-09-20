@@ -64,7 +64,7 @@ const DEFAULT_NEXT: NextTournament = {
   capacity: "Team de 3",
   prize: "180€ / 120€ / 60€",
   registrationOpen: true,
-  entryFeeCents: 3000,
+  entryFeeCents: 1000,
   currency: "EUR",
 };
 
