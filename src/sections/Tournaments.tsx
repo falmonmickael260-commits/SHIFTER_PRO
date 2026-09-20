@@ -180,23 +180,28 @@ export function Tournaments({
 
   const hasEntryFee = Boolean(next.entryFeeCents && next.entryFeeCents > 0);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
 
-    const result = await sendRegistration({
+    // Open PayPal synchronously, first thing, still inside the click
+    // handler — browsers drop "this tab was opened by a real click"
+    // status once anything is awaited first, and silently block the
+    // popup. sendRegistration (below) does await a fetch call when
+    // Web3Forms is configured, so it must run after, not before.
+    if (hasEntryFee) {
+      window.open(paypalMeLink(next.entryFeeCents! / 100), "_blank", "noopener,noreferrer");
+    }
+
+    sendRegistration({
       pseudo: String(form.get("pseudo") ?? ""),
       activisionId: String(form.get("activisionId") ?? ""),
       discord: String(form.get("discord") ?? ""),
       team: String(form.get("team") ?? ""),
       isCaptain,
+    }).then((result) => {
+      setSubmitState(result === "sent-automatically" ? "sent-auto" : "sent-draft");
     });
-
-    if (hasEntryFee) {
-      window.open(paypalMeLink(next.entryFeeCents! / 100), "_blank", "noopener,noreferrer");
-    }
-
-    setSubmitState(result === "sent-automatically" ? "sent-auto" : "sent-draft");
   }
 
   const { ref: nextRef, visible: nextVisible } = useInView<HTMLDivElement>();
