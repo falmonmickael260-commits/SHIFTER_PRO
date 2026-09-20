@@ -43,8 +43,15 @@
 }
 
 .business__fallback {
+  display: block;
+  margin-top: var(--sp-space-2);
   font-family: var(--sp-font-body);
   font-size: 14px;
   color: var(--sp-steel-light);
+  text-decoration: none;
 }
 .business__fallback strong { color: var(--sp-white); }
+a.business__fallback:hover,
+a.business__fallback:focus-visible { color: var(--sp-accent); }
+a.business__fallback:hover strong,
+a.business__fallback:focus-visible strong { color: var(--sp-accent); }

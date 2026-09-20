@@ -7,6 +7,9 @@ export interface HeroProps {
   eyebrow?: string;
   twitchHandle?: string;
   discordTag?: string;
+  /** Real invite link (discord.gg/...) — when set, the Discord tag becomes
+   * a real link instead of a copy-the-tag button. */
+  discordInviteUrl?: string;
   /** Real live status — false (OFFLINE) until a real Twitch check is wired up. */
   live?: boolean;
   watchLiveHref?: string;
@@ -25,6 +28,7 @@ export function Hero({
   eyebrow = "GAMING • LIVE • TOURNAMENTS",
   twitchHandle = "SHIFTER_PRO2",
   discordTag = "BKHHWW.26",
+  discordInviteUrl,
   live = false,
   watchLiveHref = "#live",
   tournamentsHref = "#tournaments",
@@ -92,15 +96,26 @@ export function Hero({
           >
             TWITCH // {twitchHandle}
           </a>
-          <button className="hero__tag hero__tag--action" type="button" onClick={copyDiscordTag}>
-            DISCORD // {discordTag}
-            <span className="hero__sr-only" aria-live="polite">
-              {copied ? "Tag copié dans le presse-papiers" : ""}
-            </span>
-            <span className="hero__tag-hint" aria-hidden="true">
-              {copied ? "COPIÉ" : "COPIER"}
-            </span>
-          </button>
+          {discordInviteUrl ? (
+            <a
+              className="hero__tag hero__tag--link"
+              href={discordInviteUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              DISCORD // {discordTag}
+            </a>
+          ) : (
+            <button className="hero__tag hero__tag--action" type="button" onClick={copyDiscordTag}>
+              DISCORD // {discordTag}
+              <span className="hero__sr-only" aria-live="polite">
+                {copied ? "Tag copié dans le presse-papiers" : ""}
+              </span>
+              <span className="hero__tag-hint" aria-hidden="true">
+                {copied ? "COPIÉ" : "COPIER"}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 

@@ -49,6 +49,7 @@ export interface TournamentsProps {
   /** No fabricated results — real events only, sourced from the streamer's own tournament flyers. */
   history?: PastTournament[];
   rules?: Rule[];
+  discordInviteUrl?: string;
 }
 
 const DEFAULT_NEXT: NextTournament = {
@@ -168,7 +169,12 @@ function Podium({ tournament }: { tournament: PastTournament }) {
  * the full Supabase + PayPal Orders API flow (still in supabase/functions
  * for later, just not wired up here).
  */
-export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, rules = DEFAULT_RULES }: TournamentsProps) {
+export function Tournaments({
+  next = DEFAULT_NEXT,
+  history = DEFAULT_HISTORY,
+  rules = DEFAULT_RULES,
+  discordInviteUrl,
+}: TournamentsProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [isCaptain, setIsCaptain] = useState(false);
 
@@ -302,7 +308,7 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
           </form>
         </div>
 
-        <TournamentRules rules={rules} />
+        <TournamentRules rules={rules} discordInviteUrl={discordInviteUrl} />
 
         <div ref={historyRef} className={`tournament-history reveal${historyVisible ? " reveal--visible" : ""}`}>
           <h3 className="tournament-history__title">Historique</h3>

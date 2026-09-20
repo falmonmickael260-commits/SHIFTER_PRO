@@ -10,6 +10,10 @@ import { About } from "./sections/About";
 import { Business } from "./sections/Business";
 import "./App.css";
 
+// The one real Discord invite for the whole site — every Discord button
+// anywhere on the page passes this same constant, never a re-typed copy.
+const DISCORD_INVITE_URL = "https://discord.gg/KsvzzU6g9";
+
 function App() {
   const [runId, setRunId] = useState(0);
   const [loaderDone, setLoaderDone] = useState(false);
@@ -21,13 +25,13 @@ function App() {
           continuous scene rather than a hard swap. */}
       <Navbar />
       <main>
-        <Hero />
+        <Hero discordInviteUrl={DISCORD_INVITE_URL} />
         <Live />
         <Clips />
-        <Tournaments />
-        <Community tiktokHandle="shifter_pro26" />
+        <Tournaments discordInviteUrl={DISCORD_INVITE_URL} />
+        <Community tiktokHandle="shifter_pro26" discordInviteUrl={DISCORD_INVITE_URL} />
         <About />
-        <Business />
+        <Business discordInviteUrl={DISCORD_INVITE_URL} />
       </main>
 
       {!loaderDone && <ShifterLoader key={runId} onComplete={() => setLoaderDone(true)} />}

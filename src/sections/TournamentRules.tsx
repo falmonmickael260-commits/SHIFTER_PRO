@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useInView } from "../hooks/useInView";
-import { ShieldAlertIcon, TrophyIcon } from "../components/icons";
+import { DiscordIcon, ShieldAlertIcon, TrophyIcon } from "../components/icons";
 import "./TournamentRules.css";
 
 export interface Rule {
@@ -12,6 +12,9 @@ export interface Rule {
 
 export interface TournamentRulesProps {
   rules: Rule[];
+  /** Real invite link (discord.gg/...) — rule #3 (join Discord) gets its
+   * own join button once this is set. */
+  discordInviteUrl?: string;
 }
 
 // Official rules poster — same Cloudinary asset used for CASHPRIZE 2,
@@ -30,7 +33,7 @@ const THUMB_SRCSET = [420, 640, 900]
   .join(", ");
 const LIGHTBOX_SRC = posterUrl("f_auto,q_auto:best,w_1600");
 
-export function TournamentRules({ rules }: TournamentRulesProps) {
+export function TournamentRules({ rules, discordInviteUrl }: TournamentRulesProps) {
   const { ref, visible } = useInView<HTMLDivElement>();
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -88,6 +91,16 @@ export function TournamentRules({ rules }: TournamentRulesProps) {
                   <h4 className="rule-card__title">{rule.title}</h4>
                 </div>
                 <p className="rule-card__text">{rule.description}</p>
+                {rule.number === 3 && discordInviteUrl && (
+                  <a
+                    className="rule-card__discord"
+                    href={discordInviteUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <DiscordIcon aria-hidden="true" /> Rejoindre le Discord
+                  </a>
+                )}
               </div>
             </li>
           ))}

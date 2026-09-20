@@ -7,11 +7,16 @@ export interface BusinessProps {
    * only confirmed contact channel, rather than inventing an address. */
   contactEmail?: string;
   discordTag?: string;
+  discordInviteUrl?: string;
 }
 
 const AREAS = ["Sponsors", "Partenariats", "Collaborations", "Événements"];
 
-export function Business({ contactEmail = "Vantm26100@hotmail.com", discordTag = "BKHHWW.26" }: BusinessProps) {
+export function Business({
+  contactEmail = "Vantm26100@hotmail.com",
+  discordTag = "BKHHWW.26",
+  discordInviteUrl,
+}: BusinessProps) {
   const { ref, visible } = useInView<HTMLDivElement>();
 
   return (
@@ -34,9 +39,15 @@ export function Business({ contactEmail = "Vantm26100@hotmail.com", discordTag =
             Call of Duty.
           </p>
 
-          {contactEmail ? (
+          {contactEmail && (
             <a className="business__cta" href={`mailto:${contactEmail}`}>
               {contactEmail}
+            </a>
+          )}
+
+          {discordInviteUrl ? (
+            <a className="business__fallback" href={discordInviteUrl} target="_blank" rel="noreferrer">
+              Ou rejoins le Discord — <strong>{discordTag}</strong>
             </a>
           ) : (
             <p className="business__fallback">

@@ -134,6 +134,35 @@
   color: var(--sp-steel-light);
 }
 
+.rule-card__discord {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 7px 14px;
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.5);
+  border-radius: var(--sp-radius-sm);
+  background: rgba(var(--poster-accent-rgb), 0.08);
+  color: var(--poster-accent);
+  font-family: var(--sp-font-body);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  transition: background var(--sp-duration-fast), transform var(--sp-duration-fast), box-shadow var(--sp-duration-fast);
+}
+.rule-card__discord svg { font-size: 15px; }
+.rule-card__discord:hover,
+.rule-card__discord:focus-visible {
+  background: var(--poster-accent);
+  color: #060a06;
+  transform: translateY(-1px);
+  box-shadow: 0 0 18px -4px rgba(var(--poster-accent-rgb), 0.6);
+}
+.rule-card__discord:active { transform: translateY(0) scale(0.96); }
+.rule-card__discord:focus-visible { outline: 2px solid var(--poster-accent); outline-offset: 2px; }
+
 /* ---- lightbox ------------------------------------------------------------- */
 
 .rules-lightbox {
