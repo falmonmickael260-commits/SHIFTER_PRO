@@ -24,7 +24,7 @@ export function Hero({
   displayName = "SHIFTER_PRO",
   eyebrow = "GAMING • LIVE • TOURNAMENTS",
   twitchHandle = "SHIFTER_PRO2",
-  discordTag = "BKHWW.26",
+  discordTag = "BKHHWW.26",
   live = false,
   watchLiveHref = "#live",
   tournamentsHref = "#tournaments",

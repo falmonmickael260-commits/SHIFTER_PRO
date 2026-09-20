@@ -16,7 +16,7 @@ export interface CommunityProps {
 }
 
 export function Community({
-  discordTag = "BKHWW.26",
+  discordTag = "BKHHWW.26",
   discordInviteUrl,
   twitchHandle = "shifter_pro2",
   kickHandle,

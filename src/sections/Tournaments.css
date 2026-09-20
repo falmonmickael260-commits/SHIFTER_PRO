@@ -147,6 +147,47 @@
   min-height: 1em;
 }
 
+/* ---- rules ------------------------------------------------------------------- */
+
+.tournament-rules { margin-top: var(--sp-space-6); }
+.tournament-rules__title {
+  margin: 0 0 var(--sp-space-3);
+  font-family: var(--sp-font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: var(--sp-white);
+}
+.tournament-rules__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--sp-space-2);
+}
+.tournament-rules__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: var(--sp-space-3);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-sm);
+  background: var(--sp-surface);
+  font-family: var(--sp-font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--sp-steel-light);
+}
+.tournament-rules__item svg { flex: none; margin-top: 2px; font-size: 16px; color: var(--sp-steel); }
+.tournament-rules__item[data-restricted="true"] {
+  border-color: rgba(var(--sp-live-rgb), 0.35);
+  color: var(--sp-white);
+}
+.tournament-rules__item[data-restricted="true"] svg { color: var(--sp-live); }
+
+/* ---- history / podium --------------------------------------------------------- */
+
 .tournament-history {
   margin-top: var(--sp-space-6);
 }
@@ -167,15 +208,74 @@
   padding: var(--sp-space-5);
   text-align: center;
 }
-.tournament-history__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
-.tournament-history__item {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--sp-space-3);
-  padding: var(--sp-space-3) var(--sp-space-4);
-  background: var(--sp-surface);
+.tournament-history__list { display: flex; flex-direction: column; gap: var(--sp-space-4); }
+
+.podium-card {
   border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-md);
+  background: var(--sp-surface);
+  padding: var(--sp-space-5);
 }
-.tournament-history__name { font-weight: 600; color: var(--sp-white); }
-.tournament-history__date { font-family: var(--sp-font-mono); font-size: 12px; color: var(--sp-steel-light); }
-.tournament-history__result { font-family: var(--sp-font-mono); font-size: 12px; color: var(--sp-accent); }
+.podium-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-space-2);
+  margin-bottom: var(--sp-space-4);
+}
+.podium-card__name { font-family: var(--sp-font-display); font-weight: 700; font-size: 1.1rem; color: var(--sp-white); text-transform: uppercase; }
+.podium-card__date { font-family: var(--sp-font-mono); font-size: 12px; color: var(--sp-steel-light); }
+
+.podium-card__ranks {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  align-items: end;
+  gap: var(--sp-space-3);
+}
+
+.podium-rank {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  padding: var(--sp-space-4) var(--sp-space-2);
+  border: 1px solid var(--sp-border-strong);
+  border-radius: var(--sp-radius-md);
+  background: var(--sp-surface-raised);
+}
+.podium-rank__crown { font-size: 22px; color: var(--sp-steel-light); }
+.podium-rank__place {
+  font-family: var(--sp-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sp-steel-light);
+}
+.podium-rank__team { font-family: var(--sp-font-body); font-weight: 700; font-size: 15px; color: var(--sp-white); }
+.podium-rank__prize { font-family: var(--sp-font-mono); font-size: 13px; color: var(--sp-accent); }
+
+.podium-rank--1 {
+  order: 2;
+  padding-top: var(--sp-space-5);
+  border-color: var(--sp-accent);
+  box-shadow: 0 0 28px -8px rgba(var(--sp-accent-rgb), 0.5);
+}
+.podium-rank--1 .podium-rank__crown { color: var(--sp-accent); font-size: 26px; }
+.podium-rank--2 { order: 1; }
+.podium-rank--3 { order: 3; }
+
+.podium-card__note {
+  margin: var(--sp-space-4) 0 0;
+  font-family: var(--sp-font-body);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--sp-steel-light);
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .podium-card__ranks { grid-template-columns: 1fr; }
+  .podium-rank--1, .podium-rank--2, .podium-rank--3 { order: initial; }
+}

@@ -25,7 +25,7 @@ function App() {
         <Live />
         <Clips />
         <Tournaments />
-        <Community tiktokHandle="shifter_pro" />
+        <Community tiktokHandle="shifter_pro26" />
         <About />
         <Business />
       </main>

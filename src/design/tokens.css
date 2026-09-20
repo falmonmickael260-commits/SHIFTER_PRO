@@ -17,8 +17,11 @@
   --sp-steel: #5b6670;
   --sp-steel-light: #a9b4bb;
   --sp-white: #eef2f4;
-  --sp-accent: #c9ff3a;
-  --sp-accent-rgb: 201, 255, 58;
+  /* Electric warzone gold — matches the real SHIFTER_PRO26 tournament
+     flyers (TikTok/Discord/Twitch marketing). Replaces an earlier
+     placeholder lime green now that real brand material exists. */
+  --sp-accent: #ffd400;
+  --sp-accent-rgb: 255, 212, 0;
 
   /* ---- color: surfaces & borders (new — needed once content leaves the
      loader's single full-bleed scene and becomes cards/nav/sections) ---- */

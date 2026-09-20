@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from "react";
 import { SectionHeading } from "../components/SectionHeading";
-import { CalendarIcon, TrophyIcon, UsersIcon } from "../components/icons";
+import { CalendarIcon, CrownIcon, ShieldAlertIcon, TrophyIcon, UsersIcon } from "../components/icons";
 import { useInView } from "../hooks/useInView";
 import "./Tournaments.css";
 
@@ -14,27 +14,92 @@ export interface NextTournament {
   registrationOpen: boolean;
 }
 
+export interface PodiumEntry {
+  place: 1 | 2 | 3;
+  team: string;
+  prize?: string;
+}
+
 export interface PastTournament {
   id: string;
   name: string;
   date: string;
-  result: string;
+  podium: PodiumEntry[];
+  note?: string;
+}
+
+export interface Rule {
+  text: string;
+  restricted?: boolean;
 }
 
 export interface TournamentsProps {
   next?: NextTournament;
-  /** No fabricated results — genuinely empty until a first real event happened. */
+  /** No fabricated results — real events only, sourced from the streamer's own tournament flyers. */
   history?: PastTournament[];
+  rules?: Rule[];
 }
 
 const DEFAULT_NEXT: NextTournament = {
-  game: "Call of Duty",
-  format: "À confirmer",
+  game: "Call of Duty Warzone — Rebirth Island",
+  date: "Environ 10 jours après le 19/09/2026 — date exacte à confirmer",
+  format: "Trio — Ranked",
   capacity: "À confirmer",
   registrationOpen: false,
 };
 
+const DEFAULT_HISTORY: PastTournament[] = [
+  {
+    id: "warzone-2026-09-19",
+    name: "Tournoi Warzone — Rebirth Island",
+    date: "19 septembre 2026",
+    podium: [
+      { place: 1, team: "Team DINAZ", prize: "150€" },
+      { place: 2, team: "Team MK's Elite", prize: "50€" },
+      { place: 3, team: "Team SOFT", prize: "Cadeau" },
+    ],
+    note: "Un grand merci à tous ceux qui ont participé — vous avez fait de ce tournoi une vraie réussite !",
+  },
+];
+
+const DEFAULT_RULES: Rule[] = [
+  { text: "Mode : Trio — Ranked" },
+  { text: "3 Top 1 pour gagner" },
+  { text: "Pompe enflammée interdite", restricted: true },
+  { text: "Lance-roquettes interdit", restricted: true },
+  { text: "Glitch & triche = banni instantanément", restricted: true },
+  { text: "Priorité aux équipes inscrites" },
+  { text: "Serveur Discord obligatoire pour être en vocal — absence = expulsion instantanée" },
+  { text: "Respect, ponctualité, bienveillance" },
+  { text: "Tournoi retransmis en direct sur TikTok" },
+];
+
+const PLACE_LABEL: Record<1 | 2 | 3, string> = { 1: "1ère place", 2: "2ème place", 3: "3ème place" };
+
 type SubmitState = "idle" | "sent";
+
+function Podium({ tournament }: { tournament: PastTournament }) {
+  const ordered = [...tournament.podium].sort((a, b) => a.place - b.place);
+  return (
+    <div className="podium-card">
+      <div className="podium-card__head">
+        <span className="podium-card__name">{tournament.name}</span>
+        <span className="podium-card__date">{tournament.date}</span>
+      </div>
+      <div className="podium-card__ranks">
+        {ordered.map((entry) => (
+          <div key={entry.place} className={`podium-rank podium-rank--${entry.place}`}>
+            <CrownIcon className="podium-rank__crown" aria-hidden="true" />
+            <span className="podium-rank__place">{PLACE_LABEL[entry.place]}</span>
+            <span className="podium-rank__team">{entry.team}</span>
+            {entry.prize && <span className="podium-rank__prize">{entry.prize}</span>}
+          </div>
+        ))}
+      </div>
+      {tournament.note && <p className="podium-card__note">{tournament.note}</p>}
+    </div>
+  );
+}
 
 /**
  * Registration UI only — no backend is connected yet. Submitting shows an
@@ -43,7 +108,7 @@ type SubmitState = "idle" | "sent";
  * what a future Supabase table would need, so wiring it up later is a
  * matter of an API call here, not a redesign.
  */
-export function Tournaments({ next = DEFAULT_NEXT, history = [] }: TournamentsProps) {
+export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, rules = DEFAULT_RULES }: TournamentsProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [isCaptain, setIsCaptain] = useState(false);
 
@@ -54,12 +119,13 @@ export function Tournaments({ next = DEFAULT_NEXT, history = [] }: TournamentsPr
 
   const { ref: nextRef, visible: nextVisible } = useInView<HTMLDivElement>();
   const { ref: formRef, visible: formVisible } = useInView<HTMLFormElement>();
+  const { ref: rulesRef, visible: rulesVisible } = useInView<HTMLDivElement>();
   const { ref: historyRef, visible: historyVisible } = useInView<HTMLDivElement>();
 
   return (
     <section className="tournaments" id="tournaments">
       <div className="tournaments__inner">
-        <SectionHeading eyebrow="COMPETITION" title="Tournaments" />
+        <SectionHeading eyebrow="COMPETITION // SHIFTER_PRO26" title="Tournaments" />
 
         <div className="tournaments__layout">
           <div ref={nextRef} className={`next-tournament reveal${nextVisible ? " reveal--visible" : ""}`}>
@@ -139,6 +205,18 @@ export function Tournaments({ next = DEFAULT_NEXT, history = [] }: TournamentsPr
           </form>
         </div>
 
+        <div ref={rulesRef} className={`tournament-rules reveal${rulesVisible ? " reveal--visible" : ""}`}>
+          <h3 className="tournament-rules__title">Règles du tournoi</h3>
+          <ul className="tournament-rules__list">
+            {rules.map((rule) => (
+              <li key={rule.text} className="tournament-rules__item" data-restricted={rule.restricted ? "true" : "false"}>
+                <ShieldAlertIcon aria-hidden="true" />
+                <span>{rule.text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div ref={historyRef} className={`tournament-history reveal${historyVisible ? " reveal--visible" : ""}`}>
           <h3 className="tournament-history__title">Historique</h3>
           {history.length === 0 ? (
@@ -146,15 +224,11 @@ export function Tournaments({ next = DEFAULT_NEXT, history = [] }: TournamentsPr
               L'historique des tournois s'affichera ici après le premier événement.
             </p>
           ) : (
-            <ul className="tournament-history__list">
+            <div className="tournament-history__list">
               {history.map((entry) => (
-                <li key={entry.id} className="tournament-history__item">
-                  <span className="tournament-history__name">{entry.name}</span>
-                  <span className="tournament-history__date">{entry.date}</span>
-                  <span className="tournament-history__result">{entry.result}</span>
-                </li>
+                <Podium key={entry.id} tournament={entry} />
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </div>

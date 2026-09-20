@@ -9,7 +9,7 @@ export const colorTokens = {
   steel: "#5b6670",
   steelLight: "#a9b4bb",
   white: "#eef2f4",
-  accent: "#c9ff3a",
+  accent: "#ffd400",
   live: "#ff4d4d",
 } as const;
 

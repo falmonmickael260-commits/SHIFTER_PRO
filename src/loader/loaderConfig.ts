@@ -11,7 +11,7 @@ export const defaultShifterLoaderConfig: ShifterLoaderConfig = {
     playerName: "SHIFTER_PRO",
     tagline: "COD // STREAMER",
     twitchLine: "TWITCH // SHIFTER_PRO2",
-    discordLine: "DISCORD // BKHWW.26",
+    discordLine: "DISCORD // BKHHWW.26",
     bootLines: [
       "SYSTEM BOOT",
       "INITIALIZING COMBAT INTERFACE",
@@ -27,7 +27,7 @@ export const defaultShifterLoaderConfig: ShifterLoaderConfig = {
     steel: "#5b6670",
     steelLight: "#a9b4bb",
     white: "#eef2f4",
-    accent: "#c9ff3a",
+    accent: "#ffd400",
   },
 
   // Total default runtime: 900 + 1100 + 650 + 900 + 700 + 500 = 4750ms

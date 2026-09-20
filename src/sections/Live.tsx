@@ -144,6 +144,10 @@ export function Live({ twitchHandle = "shifter_pro2", kickHandle, live = false }
           >
             Ouvrir sur Twitch <ExternalLinkIcon />
           </a>
+
+          <p className="live__broadcast-note">
+            Les jours de tournoi SHIFTER_PRO26, la diffusion démarre généralement à 21h sur Twitch.
+          </p>
         </div>
       </div>
     </section>

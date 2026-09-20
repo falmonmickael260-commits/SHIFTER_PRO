@@ -11,7 +11,7 @@ export interface BusinessProps {
 
 const AREAS = ["Sponsors", "Partenariats", "Collaborations", "Événements"];
 
-export function Business({ contactEmail, discordTag = "BKHWW.26" }: BusinessProps) {
+export function Business({ contactEmail, discordTag = "BKHHWW.26" }: BusinessProps) {
   const { ref, visible } = useInView<HTMLDivElement>();
 
   return (
