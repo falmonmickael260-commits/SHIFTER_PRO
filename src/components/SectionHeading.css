@@ -1,0 +1,26 @@
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2);
+  margin-bottom: var(--sp-space-6);
+}
+.section-heading--center { align-items: center; text-align: center; }
+
+.section-heading__eyebrow {
+  font-family: var(--sp-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.35em;
+  color: var(--sp-accent);
+  text-transform: uppercase;
+}
+
+.section-heading__title {
+  margin: 0;
+  font-family: var(--sp-font-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--sp-white);
+  text-wrap: balance;
+}

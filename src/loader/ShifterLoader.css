@@ -1,0 +1,489 @@
+/* ==========================================================================
+   SHIFTER_PRO — tactical boot loader
+   All colors/durations come from CSS custom properties set inline by
+   ShifterLoader.tsx (see loaderConfig.ts) — nothing here is hardcoded per
+   instance, only structural/animation constants that aren't meant to be
+   themeable (stagger steps, blur radii, etc.).
+   ========================================================================== */
+
+.shifter-loader {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(
+      120% 120% at 50% 20%,
+      var(--color-bg-base) 0%,
+      var(--color-bg-deep) 70%
+    );
+  color: var(--color-white);
+  font-family: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+}
+
+.shifter-loader[data-fullscreen="true"] {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.shifter-loader__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---- canvas / atmosphere layers ---------------------------------------- */
+
+.shifter-loader__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.shifter-loader__vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 100% at 50% 45%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+.shifter-loader__scanline-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.6) 0px,
+    rgba(255, 255, 255, 0.6) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.shifter-loader__noise {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-repeat: repeat;
+  background-size: 140px 140px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: shifterNoiseShift 1.2s steps(4) infinite;
+}
+
+@keyframes shifterNoiseShift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2%, 1%); }
+  50% { transform: translate(1%, -2%); }
+  75% { transform: translate(-1%, -1%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---- HUD chrome ---------------------------------------------------------- */
+
+.shifter-loader__hud {
+  position: absolute;
+  inset: clamp(14px, 4vw, 32px);
+  pointer-events: none;
+  opacity: 0;
+  animation: shifterFadeIn 900ms ease 150ms forwards;
+}
+
+.shifter-loader__corner {
+  position: absolute;
+  width: clamp(18px, 3vw, 28px);
+  height: clamp(18px, 3vw, 28px);
+  border: 1.5px solid var(--color-steel-light);
+  opacity: 0.55;
+}
+
+.shifter-loader__corner--tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+.shifter-loader__corner--tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+.shifter-loader__corner--bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+.shifter-loader__corner--br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+.shifter-loader__readout {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: clamp(9px, 1.1vw, 11px);
+  letter-spacing: 0.08em;
+  color: var(--color-steel-light);
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.shifter-loader__readout--tl { top: 14px; left: 14px; }
+.shifter-loader__readout--br { bottom: 14px; right: 14px; text-align: right; align-items: flex-end; }
+
+@media (max-width: 640px) {
+  .shifter-loader__readout--br { display: none; }
+}
+
+/* ---- main scene ----------------------------------------------------------- */
+
+.shifter-loader__scene {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vh, 18px);
+  padding: 24px;
+  text-align: center;
+}
+
+[data-phase="impact"][data-shake="true"] .shifter-loader__scene {
+  animation: shifterCamShake var(--duration-impact) ease-in-out;
+}
+
+@keyframes shifterCamShake {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(calc(var(--glitch-intensity) * -3px), calc(var(--glitch-intensity) * 2px)); }
+  40% { transform: translate(calc(var(--glitch-intensity) * 3px), calc(var(--glitch-intensity) * -2px)); }
+  60% { transform: translate(calc(var(--glitch-intensity) * -2px), calc(var(--glitch-intensity) * 1px)); }
+  80% { transform: translate(calc(var(--glitch-intensity) * 2px), 0); }
+}
+
+/* ---- boot text ------------------------------------------------------------- */
+
+.shifter-loader__boot {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: min(80vw, 360px);
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+
+[data-identified="true"] .shifter-loader__boot {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-8px);
+  pointer-events: none;
+}
+
+.shifter-loader__boot-line {
+  margin: 0;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: clamp(10px, 1.3vw, 13px);
+  letter-spacing: 0.04em;
+  color: var(--color-steel-light);
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+[data-phase="boot"] .shifter-loader__boot-line {
+  animation: shifterBootLineIn 500ms ease forwards;
+  animation-delay: calc(var(--line-index) * 220ms);
+}
+
+[data-reduced-motion="true"] .shifter-loader__boot-line {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  transition: opacity 250ms ease;
+  transition-delay: calc(var(--line-index) * 150ms);
+}
+
+.shifter-loader__boot-caret {
+  color: var(--color-accent);
+  opacity: 0.8;
+}
+
+@keyframes shifterBootLineIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- identify tag ---------------------------------------------------------- */
+
+.shifter-loader__identify-tag {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: clamp(10px, 1.4vw, 13px);
+  letter-spacing: 0.35em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 500ms ease, transform 500ms ease;
+}
+
+[data-identified="true"] .shifter-loader__identify-tag {
+  opacity: 0.9;
+  transform: translateY(0);
+}
+
+/* ---- name reveal ------------------------------------------------------------ */
+
+.shifter-loader__name-wrap {
+  position: relative;
+  line-height: 1;
+  padding: 0.1em 0;
+}
+
+.shifter-loader__name-base,
+.shifter-loader__name-highlight,
+.shifter-loader__name-glitch {
+  display: block;
+  font-family: "Rajdhani", "Chakra Petch", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(2.4rem, 11vw, 6.2rem);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.shifter-loader__name-base {
+  color: var(--color-steel);
+  opacity: 0.3;
+}
+
+.shifter-loader__name-highlight {
+  position: absolute;
+  inset: 0;
+  color: var(--color-white);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path var(--duration-identify) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-identified="true"] .shifter-loader__name-highlight {
+  clip-path: inset(0 0 0 0);
+}
+
+.shifter-loader__name-glitch {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.shifter-loader__name-glitch--a { color: var(--color-accent); }
+.shifter-loader__name-glitch--b { color: var(--color-white); }
+
+[data-phase="impact"] .shifter-loader__name-glitch--a {
+  animation: shifterGlitchA var(--duration-impact) steps(1, jump-none) both;
+}
+
+[data-phase="impact"] .shifter-loader__name-glitch--b {
+  animation: shifterGlitchB var(--duration-impact) steps(1, jump-none) both;
+}
+
+@keyframes shifterGlitchA {
+  0% { opacity: 0; transform: translateX(0); }
+  10% { opacity: calc(var(--glitch-intensity) * 0.8); transform: translateX(calc(var(--glitch-intensity) * -6px)); }
+  22% { opacity: 0; transform: translateX(0); }
+  55% { opacity: calc(var(--glitch-intensity) * 0.5); transform: translateX(calc(var(--glitch-intensity) * 4px)); }
+  70% { opacity: 0; }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+@keyframes shifterGlitchB {
+  0% { opacity: 0; transform: translateX(0); }
+  14% { opacity: calc(var(--glitch-intensity) * 0.7); transform: translateX(calc(var(--glitch-intensity) * 6px)); }
+  26% { opacity: 0; }
+  60% { opacity: calc(var(--glitch-intensity) * 0.4); transform: translateX(calc(var(--glitch-intensity) * -4px)); }
+  75% { opacity: 0; }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+.shifter-loader__scan-bar {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  width: min(14%, 60px);
+  left: -20%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-accent) 55%, transparent) 45%,
+    color-mix(in srgb, var(--color-white) 70%, transparent) 50%,
+    color-mix(in srgb, var(--color-accent) 55%, transparent) 55%,
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-phase="identify"] .shifter-loader__scan-bar {
+  animation: shifterScanSweep var(--duration-identify) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes shifterScanSweep {
+  0% { transform: translateX(0); opacity: 0; }
+  8% { opacity: 0.9; }
+  85% { opacity: 0.9; }
+  100% { transform: translateX(560%); opacity: 0; }
+}
+
+.shifter-loader__tagline {
+  display: block;
+  margin-top: clamp(10px, 2vh, 16px);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: clamp(10px, 1.3vw, 13px);
+  letter-spacing: 0.4em;
+  color: var(--color-steel-light);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 500ms ease 80ms, transform 500ms ease 80ms;
+}
+
+[data-identified="true"] .shifter-loader__tagline {
+  opacity: 0.75;
+  transform: translateY(0);
+}
+
+/* ---- connection tags -------------------------------------------------------- */
+
+.shifter-loader__connection {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(8px, 1.6vw, 14px);
+  margin-top: clamp(6px, 1.5vh, 12px);
+}
+
+.shifter-loader__tag {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: clamp(10px, 1.2vw, 12px);
+  letter-spacing: 0.12em;
+  color: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-steel-light) 45%, transparent);
+  background: color-mix(in srgb, var(--color-bg-base) 60%, transparent);
+  padding: 6px 14px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 450ms ease, transform 450ms ease;
+}
+
+[data-connected="true"] .shifter-loader__tag--twitch {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0ms;
+}
+
+[data-connected="true"] .shifter-loader__tag--discord {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 180ms;
+}
+
+/* ---- ready state ------------------------------------------------------------ */
+
+.shifter-loader__ready {
+  margin-top: clamp(14px, 3vh, 22px);
+  font-family: "Rajdhani", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+  letter-spacing: 0.5em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px) scale(0.98);
+  transition: opacity var(--duration-ready) ease, transform var(--duration-ready) ease;
+}
+
+[data-mission-ready="true"] .shifter-loader__ready {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ---- impact flash ------------------------------------------------------------ */
+
+.shifter-loader__flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--color-white) 55%, var(--color-accent) 45%) 0%,
+    transparent 60%
+  );
+}
+
+[data-phase="impact"] .shifter-loader__flash {
+  animation: shifterFlashPulse var(--duration-impact) ease-out;
+}
+
+@keyframes shifterFlashPulse {
+  0% { opacity: 0; }
+  12% { opacity: calc(var(--glitch-intensity) * 0.4); }
+  30% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ---- exit transition ---------------------------------------------------------- */
+
+/* Fades the root's own background too — without this, only the children
+   fade out and the loader's opaque gradient background stays put until the
+   instant it unmounts, producing a hard pop instead of a reveal. */
+.shifter-loader[data-phase="exit"] {
+  transition: opacity var(--duration-exit) ease;
+  opacity: 0;
+}
+
+[data-phase="exit"] .shifter-loader__scene {
+  transition: opacity var(--duration-exit) ease, transform var(--duration-exit) ease;
+  opacity: 0;
+  transform: scale(1.03);
+}
+
+[data-phase="exit"] .shifter-loader__canvas,
+[data-phase="exit"] .shifter-loader__vignette,
+[data-phase="exit"] .shifter-loader__hud,
+[data-phase="exit"] .shifter-loader__noise,
+[data-phase="exit"] .shifter-loader__scanline-overlay {
+  transition: opacity var(--duration-exit) ease;
+  opacity: 0;
+}
+
+/* ---- shared keyframes -------------------------------------------------------- */
+
+@keyframes shifterFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---- reduced motion & small screens -------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .shifter-loader__name-highlight { transition-duration: 400ms; }
+  .shifter-loader__scan-bar,
+  .shifter-loader__name-glitch,
+  .shifter-loader__flash { display: none; }
+  .shifter-loader__noise { animation: none; }
+  .shifter-loader__hud { animation: none; opacity: 1; }
+  [data-phase="impact"] .shifter-loader__scene { animation: none; }
+}
+
+@media (max-width: 480px) {
+  .shifter-loader__scene { padding: 16px; gap: 10px; }
+  .shifter-loader__connection { flex-direction: column; align-items: center; }
+}

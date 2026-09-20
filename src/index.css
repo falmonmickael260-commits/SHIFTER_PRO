@@ -1,0 +1,21 @@
+/* Dark background set immediately (not waiting on React/loader CSS) so the
+   very first paint before hydration is never a white flash. */
+:root {
+  color-scheme: dark;
+  background: #050607;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #050607;
+}
+
+#root {
+  min-height: 100vh;
+}

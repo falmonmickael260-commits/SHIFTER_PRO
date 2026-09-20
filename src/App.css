@@ -1,0 +1,22 @@
+/* Dev-only QA control, not part of the shipped site — deliberately styled
+   as an obvious debug affordance (dashed border) rather than a real CTA. */
+.dev-replay {
+  position: fixed;
+  left: 14px;
+  bottom: 14px;
+  z-index: 10000;
+  background: rgba(5, 6, 7, 0.8);
+  border: 1px dashed var(--sp-steel, #5b6670);
+  color: var(--sp-steel-light, #a9b4bb);
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.dev-replay:hover {
+  border-color: var(--sp-accent, #c9ff3a);
+  color: var(--sp-accent, #c9ff3a);
+}
