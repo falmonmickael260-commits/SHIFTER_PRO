@@ -2,10 +2,17 @@ import { type FormEvent, useState } from "react";
 import { SectionHeading } from "../components/SectionHeading";
 import { CalendarIcon, CrownIcon, ShieldAlertIcon, TrophyIcon, UsersIcon } from "../components/icons";
 import { useInView } from "../hooks/useInView";
-import { PayPalButton } from "../components/PayPalButton";
-import type { RegistrationPaymentInput } from "../lib/paypal";
+import { sendRegistration } from "../lib/registration";
 import { TournamentPoster } from "./TournamentPoster";
 import "./Tournaments.css";
+
+// Direct PayPal.me payment link — the simple option: no order verification,
+// no backend, just a redirect to a real payment page. Trade-off accepted
+// on purpose (no automatic proof-of-payment link back to a registration).
+const PAYPAL_ME_USERNAME = "islemHamri";
+function paypalMeLink(amountEuros: number): string {
+  return `https://paypal.me/${PAYPAL_ME_USERNAME}/${amountEuros}EUR`;
+}
 
 export interface NextTournament {
   id: string;
@@ -49,12 +56,16 @@ export interface TournamentsProps {
 }
 
 const DEFAULT_NEXT: NextTournament = {
-  id: "next",
-  game: "Call of Duty Warzone — Rebirth Island",
-  date: "Environ 10 jours après le 19/09/2026 — date exacte à confirmer",
-  format: "Trio — Ranked",
-  capacity: "À confirmer",
-  registrationOpen: false,
+  id: "cashprize-2-2026-09-26",
+  game: "Call of Duty Warzone — Cashprize 2 — Rebirth Island",
+  date: "Samedi 26 septembre 2026",
+  time: "21H00",
+  format: "Classé — Team de 3",
+  capacity: "Team de 3",
+  prize: "180€ / 120€ / 60€",
+  registrationOpen: true,
+  entryFeeCents: 3000,
+  currency: "EUR",
 };
 
 const DEFAULT_HISTORY: PastTournament[] = [
@@ -85,7 +96,7 @@ const DEFAULT_RULES: Rule[] = [
 
 const PLACE_LABEL: Record<1 | 2 | 3, string> = { 1: "1ère place", 2: "2ème place", 3: "3ème place" };
 
-type SubmitState = "idle" | "awaiting-payment" | "paid" | "sent";
+type SubmitState = "idle" | "sent-auto" | "sent-draft";
 
 function Podium({ tournament }: { tournament: PastTournament }) {
   const ordered = [...tournament.podium].sort((a, b) => a.place - b.place);
@@ -110,69 +121,40 @@ function Podium({ tournament }: { tournament: PastTournament }) {
   );
 }
 
-const REGISTRATION_EMAIL = "Vantm26100@hotmail.com";
-
-function buildRegistrationMailto(fields: {
-  pseudo: string;
-  activisionId: string;
-  discord: string;
-  team: string;
-  isCaptain: boolean;
-}) {
-  const subject = `Inscription tournoi — ${fields.pseudo}`;
-  const body = [
-    `Pseudo : ${fields.pseudo}`,
-    `Activision ID : ${fields.activisionId}`,
-    `Discord : ${fields.discord}`,
-    `Équipe : ${fields.team || "—"}`,
-    `Capitaine : ${fields.isCaptain ? "Oui" : "Non"}`,
-  ].join("\n");
-  return `mailto:${REGISTRATION_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-}
-
 /**
- * Registration UI — no database is connected yet, so submitting opens a
- * pre-filled email to the streamer's own inbox (a real, working interim
- * path, not a fake "saved" state) instead of pretending the entry was
- * stored. The field set (pseudo / Activision ID / Discord / team /
- * captain) is exactly what a future Supabase table would need, so wiring
- * that up later is a matter of an API call here, not a redesign.
+ * Registration UI — no database is connected yet, so submitting sends the
+ * entry to the streamer's own inbox (automatically via Web3Forms once
+ * configured, or a pre-filled email draft otherwise — see
+ * src/lib/registration.ts) instead of pretending it was stored. Paid
+ * entries also open a direct PayPal.me payment link — simple on purpose;
+ * there's no automatic link back from a payment to a specific
+ * registration, that trade-off was a deliberate choice over building out
+ * the full Supabase + PayPal Orders API flow (still in supabase/functions
+ * for later, just not wired up here).
  */
 export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, rules = DEFAULT_RULES }: TournamentsProps) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [isCaptain, setIsCaptain] = useState(false);
-  const [pendingPayment, setPendingPayment] = useState<RegistrationPaymentInput | null>(null);
 
   const hasEntryFee = Boolean(next.entryFeeCents && next.entryFeeCents > 0);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    if (!hasEntryFee) {
-      const form = new FormData(event.currentTarget);
-      window.location.href = buildRegistrationMailto({
-        pseudo: String(form.get("pseudo") ?? ""),
-        activisionId: String(form.get("activisionId") ?? ""),
-        discord: String(form.get("discord") ?? ""),
-        team: String(form.get("team") ?? ""),
-        isCaptain,
-      });
-      setSubmitState("sent");
-      return;
-    }
-
     const form = new FormData(event.currentTarget);
-    setPendingPayment({
-      tournamentId: next.id,
+
+    const result = await sendRegistration({
       pseudo: String(form.get("pseudo") ?? ""),
       activisionId: String(form.get("activisionId") ?? ""),
       discord: String(form.get("discord") ?? ""),
-      team: String(form.get("team") ?? "") || undefined,
+      team: String(form.get("team") ?? ""),
       isCaptain,
-      entryFeeCents: next.entryFeeCents!,
-      currency: next.currency ?? "EUR",
     });
-    setSubmitState("awaiting-payment");
+
+    if (hasEntryFee) {
+      window.open(paypalMeLink(next.entryFeeCents! / 100), "_blank", "noopener,noreferrer");
+    }
+
+    setSubmitState(result === "sent-automatically" ? "sent-auto" : "sent-draft");
   }
 
   const { ref: nextRef, visible: nextVisible } = useInView<HTMLDivElement>();
@@ -240,49 +222,47 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
               )}
             </h3>
 
-            {submitState !== "awaiting-payment" && submitState !== "paid" && (
-              <>
-                <label className="registration__field">
-                  <span>Pseudo</span>
-                  <input type="text" name="pseudo" required autoComplete="nickname" />
-                </label>
-                <label className="registration__field">
-                  <span>Activision ID</span>
-                  <input type="text" name="activisionId" required placeholder="Pseudo#1234" />
-                </label>
-                <label className="registration__field">
-                  <span>Discord</span>
-                  <input type="text" name="discord" required placeholder="pseudo.discord" />
-                </label>
-                <label className="registration__field">
-                  <span>Équipe (optionnel)</span>
-                  <input type="text" name="team" />
-                </label>
-                <label className="registration__checkbox">
-                  <input type="checkbox" checked={isCaptain} onChange={(e) => setIsCaptain(e.target.checked)} />
-                  <span>Je suis capitaine de l'équipe</span>
-                </label>
+            <label className="registration__field">
+              <span>Pseudo</span>
+              <input type="text" name="pseudo" required autoComplete="nickname" />
+            </label>
+            <label className="registration__field">
+              <span>Activision ID</span>
+              <input type="text" name="activisionId" required placeholder="Pseudo#1234" />
+            </label>
+            <label className="registration__field">
+              <span>Discord</span>
+              <input type="text" name="discord" required placeholder="pseudo.discord" />
+            </label>
+            <label className="registration__field">
+              <span>Équipe (optionnel)</span>
+              <input type="text" name="team" />
+            </label>
+            <label className="registration__checkbox">
+              <input type="checkbox" checked={isCaptain} onChange={(e) => setIsCaptain(e.target.checked)} />
+              <span>Je suis capitaine de l'équipe</span>
+            </label>
 
-                <button type="submit" className="registration__submit cta-pulse">
-                  {hasEntryFee ? "Continuer vers le paiement" : "S'inscrire"}
-                  <span className="cta-shine" aria-hidden="true" />
-                </button>
-              </>
+            {hasEntryFee && (
+              <p className="registration__payment-hint">
+                Après l'envoi, un onglet PayPal s'ouvre pour régler les {(next.entryFeeCents! / 100).toFixed(0)}€.
+              </p>
             )}
 
-            {submitState === "awaiting-payment" && pendingPayment && (
-              <div className="registration__payment">
-                <p className="registration__payment-hint">
-                  Paiement sécurisé par PayPal — l'inscription n'est confirmée qu'une fois le paiement validé.
-                </p>
-                <PayPalButton payment={pendingPayment} onPaid={() => setSubmitState("paid")} />
-              </div>
-            )}
+            <button type="submit" className="registration__submit cta-pulse">
+              {hasEntryFee ? `S'inscrire — ${(next.entryFeeCents! / 100).toFixed(0)}€` : "S'inscrire"}
+              <span className="cta-shine" aria-hidden="true" />
+            </button>
 
             <p className="registration__status" role="status" aria-live="polite">
-              {submitState === "sent" &&
-                "Ton client email va s'ouvrir avec ta demande d'inscription pré-remplie — il ne reste plus qu'à l'envoyer pour la valider."}
-              {submitState === "paid" && "Paiement confirmé — ton inscription est enregistrée. À bientôt en jeu !"}
+              {submitState === "sent-auto" &&
+                (hasEntryFee
+                  ? "Inscription envoyée ! Finalise ton paiement sur l'onglet PayPal qui vient de s'ouvrir."
+                  : "Inscription envoyée — à bientôt en jeu !")}
+              {submitState === "sent-draft" &&
+                (hasEntryFee
+                  ? "Ton client email va s'ouvrir avec ta demande — envoie-le, puis règle le paiement sur l'onglet PayPal qui vient de s'ouvrir."
+                  : "Ton client email va s'ouvrir avec ta demande d'inscription pré-remplie — il ne reste plus qu'à l'envoyer pour la valider.")}
             </p>
           </form>
         </div>
