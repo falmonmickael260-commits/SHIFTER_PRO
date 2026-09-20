@@ -1,0 +1,203 @@
+.tournament-rules-block {
+  --poster-accent: #7cff2e;
+  --poster-accent-rgb: 124, 255, 46;
+  margin-top: var(--sp-space-6);
+}
+
+.tournament-rules-block__title {
+  margin: 0 0 var(--sp-space-4);
+  font-family: var(--sp-font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  color: var(--sp-white);
+}
+
+.tournament-rules-block__layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) 1fr;
+  gap: var(--sp-space-5);
+  align-items: start;
+}
+
+/* ---- poster thumbnail --------------------------------------------------- */
+
+.rules-poster {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.35);
+  border-radius: var(--sp-radius-md);
+  background: none;
+  overflow: hidden;
+  cursor: zoom-in;
+  box-shadow: 0 0 32px -10px rgba(var(--poster-accent-rgb), 0.4);
+  transition: box-shadow var(--sp-duration-fast), transform var(--sp-duration-fast);
+}
+.rules-poster:hover,
+.rules-poster:focus-visible {
+  box-shadow: 0 0 40px -6px rgba(var(--poster-accent-rgb), 0.6);
+}
+.rules-poster:focus-visible {
+  outline: 2px solid var(--poster-accent);
+  outline-offset: 3px;
+}
+.rules-poster:active { transform: scale(0.98); }
+
+.rules-poster__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1024 / 1536;
+  transition: transform 500ms var(--sp-ease-out);
+}
+.rules-poster:hover .rules-poster__image,
+.rules-poster:focus-visible .rules-poster__image {
+  transform: scale(1.05);
+}
+
+.rules-poster__zoom {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 5px 12px;
+  border-radius: var(--sp-radius-sm);
+  background: rgba(6, 10, 6, 0.75);
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.5);
+  color: var(--poster-accent);
+  font-family: var(--sp-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--sp-duration-fast), transform var(--sp-duration-fast);
+}
+.rules-poster:hover .rules-poster__zoom,
+.rules-poster:focus-visible .rules-poster__zoom {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- rule cards ----------------------------------------------------------- */
+
+.tournament-rules-block__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--sp-space-3);
+  align-content: start;
+}
+
+.rule-card {
+  display: flex;
+  gap: var(--sp-space-3);
+  padding: var(--sp-space-3);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-sm);
+  background: var(--sp-surface);
+}
+.rule-card[data-restricted="true"] {
+  border-color: rgba(var(--sp-live-rgb), 0.35);
+}
+
+.rule-card__number {
+  flex: none;
+  font-family: var(--sp-font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: rgba(var(--poster-accent-rgb), 0.85);
+  line-height: 1;
+}
+.rule-card[data-restricted="true"] .rule-card__number { color: var(--sp-live); }
+
+.rule-card__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rule-card__heading { display: flex; align-items: center; gap: 8px; }
+.rule-card__heading svg { flex: none; font-size: 16px; color: var(--sp-steel-light); }
+.rule-card[data-restricted="true"] .rule-card__heading svg { color: var(--sp-live); }
+
+.rule-card__title {
+  margin: 0;
+  font-family: var(--sp-font-body);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--sp-white);
+}
+.rule-card__text {
+  margin: 0;
+  font-family: var(--sp-font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sp-steel-light);
+}
+
+/* ---- lightbox ------------------------------------------------------------- */
+
+.rules-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sp-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-space-5);
+  background: rgba(2, 4, 2, 0.92);
+  backdrop-filter: blur(4px);
+  animation: rulesLightboxIn 200ms ease;
+}
+@keyframes rulesLightboxIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rules-lightbox__image {
+  max-width: min(90vw, 720px);
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  border-radius: var(--sp-radius-md);
+  box-shadow: 0 0 60px -8px rgba(var(--poster-accent-rgb), 0.5);
+  cursor: default;
+}
+
+.rules-lightbox__close {
+  position: absolute;
+  top: var(--sp-space-4);
+  right: var(--sp-space-4);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--poster-accent-rgb), 0.5);
+  background: rgba(6, 10, 6, 0.8);
+  color: var(--sp-white);
+  font-size: 16px;
+  cursor: pointer;
+  transition: border-color var(--sp-duration-fast), color var(--sp-duration-fast);
+}
+.rules-lightbox__close:hover,
+.rules-lightbox__close:focus-visible {
+  border-color: var(--poster-accent);
+  color: var(--poster-accent);
+}
+
+/* ---- responsive ------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .tournament-rules-block__layout {
+    grid-template-columns: 1fr;
+  }
+  .rules-poster { max-width: 360px; margin: 0 auto; }
+  .rules-poster__zoom { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rules-poster__image { transition: none; }
+  .rules-poster:hover .rules-poster__image { transform: none; }
+  .rules-lightbox { animation: none; }
+}

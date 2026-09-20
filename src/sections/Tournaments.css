@@ -176,44 +176,7 @@
   min-height: 1em;
 }
 
-/* ---- rules ------------------------------------------------------------------- */
-
-.tournament-rules { margin-top: var(--sp-space-6); }
-.tournament-rules__title {
-  margin: 0 0 var(--sp-space-3);
-  font-family: var(--sp-font-display);
-  font-weight: 700;
-  font-size: 1.2rem;
-  text-transform: uppercase;
-  color: var(--sp-white);
-}
-.tournament-rules__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--sp-space-2);
-}
-.tournament-rules__item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: var(--sp-space-3);
-  border: 1px solid var(--sp-border);
-  border-radius: var(--sp-radius-sm);
-  background: var(--sp-surface);
-  font-family: var(--sp-font-body);
-  font-size: 13px;
-  line-height: 1.45;
-  color: var(--sp-steel-light);
-}
-.tournament-rules__item svg { flex: none; margin-top: 2px; font-size: 16px; color: var(--sp-steel); }
-.tournament-rules__item[data-restricted="true"] {
-  border-color: rgba(var(--sp-live-rgb), 0.35);
-  color: var(--sp-white);
-}
-.tournament-rules__item[data-restricted="true"] svg { color: var(--sp-live); }
+/* Rules layout now lives in TournamentRules.css (poster + rule cards). */
 
 /* ---- history / podium --------------------------------------------------------- */
 

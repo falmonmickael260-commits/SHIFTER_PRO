@@ -1,9 +1,10 @@
 import { type FormEvent, useState } from "react";
 import { SectionHeading } from "../components/SectionHeading";
-import { CalendarIcon, CrownIcon, ShieldAlertIcon, TrophyIcon, UsersIcon } from "../components/icons";
+import { CalendarIcon, CrownIcon, TrophyIcon, UsersIcon } from "../components/icons";
 import { useInView } from "../hooks/useInView";
 import { sendRegistration } from "../lib/registration";
 import { TournamentPoster } from "./TournamentPoster";
+import { TournamentRules, type Rule } from "./TournamentRules";
 import "./Tournaments.css";
 
 // Direct PayPal.me payment link — the simple option: no order verification,
@@ -43,11 +44,6 @@ export interface PastTournament {
   note?: string;
 }
 
-export interface Rule {
-  text: string;
-  restricted?: boolean;
-}
-
 export interface TournamentsProps {
   next?: NextTournament;
   /** No fabricated results — real events only, sourced from the streamer's own tournament flyers. */
@@ -82,16 +78,56 @@ const DEFAULT_HISTORY: PastTournament[] = [
   },
 ];
 
+// Sourced word-for-word from the official rules poster — do not summarize
+// away specifics (the exact score threshold, the "no public/cross-team
+// voice" clause, the screenshot requirement) that a paraphrase would drop.
 const DEFAULT_RULES: Rule[] = [
-  { text: "Mode : Trio — Ranked" },
-  { text: "3 Top 1 pour gagner" },
-  { text: "Pompe enflammée interdite", restricted: true },
-  { text: "Lance-roquettes interdit", restricted: true },
-  { text: "Glitch & triche = banni instantanément", restricted: true },
-  { text: "Priorité aux équipes inscrites" },
-  { text: "Serveur Discord obligatoire pour être en vocal — absence = expulsion instantanée" },
-  { text: "Respect, ponctualité, bienveillance" },
-  { text: "Tournoi retransmis en direct sur TikTok" },
+  {
+    number: 1,
+    title: "Pour la victoire",
+    description: "Match point en 50 points + Top 1 — gagnez en équipe !",
+  },
+  {
+    number: 2,
+    title: "Équipe de 3 obligatoire",
+    description: "Le tournoi se joue uniquement par équipe de 3 joueurs. Aucune autre configuration ne sera acceptée.",
+  },
+  {
+    number: 3,
+    title: "Discord et vocaux obligatoires",
+    description:
+      "Il est obligatoire de rejoindre le serveur Discord du tournoi. Les vocaux sont réservés à chaque team (pas de vocaux publics ou hors team).",
+  },
+  {
+    number: 4,
+    title: "Pompe enflammée interdite",
+    description: "L'utilisation du pompe enflammée est strictement interdite sous peine de disqualification.",
+    restricted: true,
+  },
+  {
+    number: 5,
+    title: "Lance-roquettes interdit",
+    description: "L'utilisation de tout type de lance-roquettes est strictement interdite sous peine de disqualification.",
+    restricted: true,
+  },
+  {
+    number: 6,
+    title: "Avantages interdits",
+    description: "Aucun accessoire, objet ou glitch donnant un avantage en jeu n'est autorisé (gilet, masque, stim, etc.).",
+    restricted: true,
+  },
+  {
+    number: 7,
+    title: "Interdiction de quitter",
+    description: "Il est strictement interdit de quitter le tournoi tant qu'il n'a pas fini. Toute équipe qui abandonne sera disqualifiée.",
+    restricted: true,
+  },
+  {
+    number: 8,
+    title: "Screen obligatoire",
+    description:
+      "À chaque fin de game, vous devez envoyer un screen du tableau de score pour que la partie soit validée. Pas de screen = game non validée.",
+  },
 ];
 
 const PLACE_LABEL: Record<1 | 2 | 3, string> = { 1: "1ère place", 2: "2ème place", 3: "3ème place" };
@@ -159,7 +195,6 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
 
   const { ref: nextRef, visible: nextVisible } = useInView<HTMLDivElement>();
   const { ref: formRef, visible: formVisible } = useInView<HTMLFormElement>();
-  const { ref: rulesRef, visible: rulesVisible } = useInView<HTMLDivElement>();
   const { ref: historyRef, visible: historyVisible } = useInView<HTMLDivElement>();
 
   return (
@@ -267,17 +302,7 @@ export function Tournaments({ next = DEFAULT_NEXT, history = DEFAULT_HISTORY, ru
           </form>
         </div>
 
-        <div ref={rulesRef} className={`tournament-rules reveal${rulesVisible ? " reveal--visible" : ""}`}>
-          <h3 className="tournament-rules__title">Règles du tournoi</h3>
-          <ul className="tournament-rules__list">
-            {rules.map((rule) => (
-              <li key={rule.text} className="tournament-rules__item" data-restricted={rule.restricted ? "true" : "false"}>
-                <ShieldAlertIcon aria-hidden="true" />
-                <span>{rule.text}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <TournamentRules rules={rules} />
 
         <div ref={historyRef} className={`tournament-history reveal${historyVisible ? " reveal--visible" : ""}`}>
           <h3 className="tournament-history__title">Historique</h3>
